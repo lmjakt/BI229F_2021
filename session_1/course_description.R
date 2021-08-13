@@ -16,6 +16,13 @@ bul.cex <- c(3,2,1.5)
 sub.y <- 90
 
 slide.title <- function(txt, cex=4, at=0, adj=0, col=blue, ...){
+    ## adjust cex if too wide
+    uh <- with(par(), diff(usr)[3])
+    uw <- with(par(), diff(usr)[1])
+    tw <- strwidth(txt, cex=cex / par('cex'))
+    if( tw > uw ){
+        cex <- cex * uw / tw
+    }
     mtext(txt, cex=cex, at=at, col=col, adj=adj, ...)
 }
 
@@ -63,7 +70,7 @@ slides[[2]] <- function(){
     new.slide()
     slide.title('Course structure') ## , cex=4, adj=0, line=0)
     bullet.list( list( c("A weekly mixture of lectures and practicals"),
-                      list(c("45 minute lecture", "45 minute practical")),
+                      list(c("Tuesday lecture", "Friday practical")),
                       c("Extended practical sessions"),
                       list(c("3-4 hours",
                              "Number and dates to be determined")),
@@ -86,7 +93,7 @@ slides[[3]] <- function(){
                         list(c("Data mangling", "Statistical analysis", "Project management"))
                       ), bul.x, bul.y, t.cex=bul.cex)
     sc.text("Content and schedule may be adjusted as we progress\nSuggestions for changes are welcomed",
-            x=bul.x, y=0, cex=2, adj=c(0,0))
+            x=bul.x, y=strheight('A', cex=2), cex=2, adj=c(0,0))
     NULL
 }
 
@@ -94,12 +101,14 @@ slides[[4]] <- function(){
     new.slide()
     slide.title("Reference material")
     sc.text("There is a book", x=bul.x, y=0, adj=c(0,0), cex=2, max.w=50-bul.x)
-    boxText(c(50, 95, 0, 30), "But it isn't really necessary:\nalmost everything all be found on the web", max.cex=3)
+    im <- readJPEG("images/book_cover.jpg")
+    placeImage(im, 0, 95, h=85)
+    boxText(c(50, 95, 0, 30), "Good book,\nbut not that necessary:\nalmost everything can be found on the web", max.cex=3)
     NULL
 }
 
-slides[[5]] <- function(){
-    new.slide()
+slides[[5]] <- function(...){
+    new.slide(...)
     slide.title("Bioinformatics? Genomics?")
     sc.text("What are these things and why do we care?", x=bul.x, y=sub.y, adj=c(0,0), cex=4)
     dim <- bullet.list( list(c("Bioinformatics"),
@@ -113,7 +122,7 @@ slides[[5]] <- function(){
                                          "Population genomics (eg. identification of selected loci)",
                                          "...")))),
                        x=bul.x, y=bul.y, t.cex=bul.cex)
-    sc.text("We care because its useful", x=bul.x, y=0, adj=c(0,0), cex=3)
+    sc.text("We care because data is cheap", x=bul.x, y=strheight('A', cex=3), adj=c(0,0), cex=3)
     NULL
 }
 
@@ -186,6 +195,7 @@ slides[[10]] <- function(){
     new.slide()
     r.code <- readLines("pub_counts.R")
     r.col <- coloriseR(r.code)
+    get.input()
     draw.code.box(r.col, 7.5, 90, 90, 90, family='Hack', cex=1, moderation=1)
     bez.arrow( pts=cbind(c(30, 30, 15, 0), c(90, 95, 95, 95)), col=blue, border=NA, bt.n=50 )
     sc.text("A bit of R:", 32, 92, max.w=70, cex=2, adj=c(0,1))
@@ -248,7 +258,86 @@ slides[[12]] <- function(){
     NULL
 }
 
-    
+slides[[13]] <- function(...){
+    new.slide(...)
+    slide.title("Molecular biology questions")
+    dim <- bullet.list( list("What is the most common type of RNA molecule?",
+                             "How many different ways can you translate\nATGGUACTATAA ?",
+                             "What is the difference between RNA and DNA?",
+                             "What is a gene?",
+                             "Name an important consequence of double-strandedness?",
+                             "How many different codons are there?",
+                             "What are histones?",
+                             "What is gene expression?"),
+                       x=bul.x, y=bul.y, t.cex=bul.cex )
+    NULL
+}
+
+slides[[14]] <- function(...){
+    new.slide(...)
+    slide.title("Bioinformatics experience")
+    dim <- bullet.list( list("What is global and local alignment?",
+                             "How many of you have used BLAST?",
+                             "What is the problem with multiple sequence alignment?",
+                             "How do we estimate gene expression from RNA sequencing data?",
+                             "Are you familiar with: fasta, fastq, sam and bam files?",
+                             "Why is the following funny?",
+                             list("There are 10 types of people in the world",
+                                  list("Those who understand binary", "And those who don't")),
+                             "How many of you have written shell scripts?"),
+                       x=bul.x, y=bul.y, t.cex=bul.cex )
+    NULL
+}
+
+slides[[15]] <- function(...){
+    par(oma=par('mar'))
+    x <- seq(-5, 5, 0.1)
+    y1 <- dnorm(x)
+    y2 <- dlnorm(x)
+    par(mfrow=c(1,2))
+    plot(x, y2, type='l', col=red, lwd=3, xlab='x', ylab='y', new=FALSE)
+    lines(x, y1, type='l', col=blue, lwd=3)
+    new.slide()
+    slide.title("Distributions", outer=TRUE)
+    sc.text( "What are these?", x=0, y=60, cex=3, adj=c(0,0) )
+    sc.text( "What kind of processes give\nrise to them?", x=0, y=40, cex=3, adj=c(0,0) )
+    NULL
+}
+
+slides[[16]] <- function(...){
+    R1 <- c("for(i in 1:10){",
+                "   cat(paste(i, i^2, sep='\\t'), '\\n')",
+                "}")
+    R2 <- c("f1 <- function(x){",
+                "   sum(x) / length(x)",
+                "}")
+    R3 <- c("f2 <- function(x){",
+                "   sort(x)[ length(x) / 2 ]",
+                "}")
+    R1.c <- coloriseR(R1)
+    R2.c <- coloriseR(R2)
+    R3.c <- coloriseR(R3)
+    new.slide()
+    slide.title("R")
+    left <- 5
+    width <- 75
+    height <- 30
+    draw.code.box(R1.c, left, 80, width=width, height=height, cex=2, family='Monospace')
+    draw.code.box(R2.c, left, 55, width=width, height=height, cex=2, family="Monospace")
+    draw.code.box(R3.c, left, 30, width=width, height=height, cex=2, family="Monospace")
+    sc.text("What do these do?", y=strheight('A', cex=2), cex=2)
+    NULL
+}
+
+slides[[17]] <- function(...){
+    new.slide()
+    slide.title("Main question")
+    bullet.list(list("Why have you selected this course?",
+                     "What do you hope to get out of it?"),
+                x=bul.x, y=bul.y, t.cex=bul.cex)
+    NULL
+}
+
 par(mar=c(5.1, 4.1, 5.1, 4.1))
 par(mfrow=c(1,1))
 par(oma=c(0,0,0,0))
