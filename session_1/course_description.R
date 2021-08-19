@@ -221,7 +221,69 @@ slides[[11]] <- function(){
     NULL
 }
 
-slides[[12]] <- function(){
+slides[[12]] <- function(...){
+    new.slide(...)
+    slide.title("Course objectives (1)")
+    bullet.list( list("Data handling (genomics / bioinformatics data types)",
+                      list("General data formats (eg. text / binary)",
+                           "Specific data formats (sequences, alignments, etc)",
+                           "Import / parsing of data"),
+                      "Selected bioinformatics algorithms",
+                      "Sources of information (databases)",
+                      "Data visualisation",
+                      "Data analysis (statistical tests)"),
+                x=bul.x, y=bul.y, t.cex=bul.cex )
+    NULL
+}
+
+slides[[13]] <- function(...){
+    new.slide(...)
+    slide.title("Course objectives (2)")
+    bullet.list( list("Computational skills",
+                      list("File systems",
+                           "General purpose programming (R!?*^%$)",
+                           "Data extraction and munging",
+                           "Method implementation")),
+                x=bul.x, y=bul.y, t.cex=bul.cex )
+    sc.text( "Learnt from programming exercises", x=bul.x, y=strheight("A", cex=3), adj=c(0, 0), cex=3)
+    NULL
+}
+                           
+slides[[14]] <- function(...){
+    new.slide(...)
+    slide.title("Course objectives (3)")
+    bullet.list( list("Genomes",
+                      list("Anatomy (content)",
+                           "Genes",
+                           "Evolution of",
+                           "Types (nuclear, organellular)"),
+                      "Transcriptomes",
+                      list("Structure of (distribution)")),
+                x=bul.x, y=bul.y, t.cex=bul.cex)
+    NULL
+}
+                      
+slides[[15]] <- function(...){
+    new.slide(...)
+    slide.title("A practical approach")
+    r1 <- c(10, 30, 40, 60)
+    boxText(r1,
+            "Environmental sequences", max.cex=3)
+    get.input()
+    polygon(arrow.x2( 32, 50, 45, 50, 3, 6, 0.5 ))
+    bullet.list( list("Sequence origin?",
+                      "Functional roles?",
+                      "Orthology?",
+                      "Set properties"),
+                x=50, y=65, t.cex=bul.cex)
+    get.input()
+    sc.text( "Analysis of sequences in R", y=strheight("A", cex=3), cex=3, adj=c(0.5, 0))
+    NULL
+}
+                
+    
+
+slides[[16]] <- function(){
     new.slide()
     slide.title("Tentative timetable")
     weeks <- c(as.numeric( rbind(34:45, NA )), NA, NA)
@@ -258,7 +320,8 @@ slides[[12]] <- function(){
     NULL
 }
 
-slides[[13]] <- function(...){
+
+slides[[17]] <- function(...){
     new.slide(...)
     slide.title("Molecular biology questions")
     dim <- bullet.list( list("What is the most common type of RNA molecule?",
@@ -273,7 +336,7 @@ slides[[13]] <- function(...){
     NULL
 }
 
-slides[[14]] <- function(...){
+slides[[18]] <- function(...){
     new.slide(...)
     slide.title("Bioinformatics experience")
     dim <- bullet.list( list("What is global and local alignment?",
@@ -289,7 +352,7 @@ slides[[14]] <- function(...){
     NULL
 }
 
-slides[[15]] <- function(...){
+slides[[19]] <- function(...){
     par(oma=par('mar'))
     x <- seq(-5, 5, 0.1)
     y1 <- dnorm(x)
@@ -304,7 +367,7 @@ slides[[15]] <- function(...){
     NULL
 }
 
-slides[[16]] <- function(...){
+slides[[20]] <- function(...){
     R1 <- c("for(i in 1:10){",
                 "   cat(paste(i, i^2, sep='\\t'), '\\n')",
                 "}")
@@ -329,7 +392,7 @@ slides[[16]] <- function(...){
     NULL
 }
 
-slides[[17]] <- function(...){
+slides[[21]] <- function(...){
     new.slide()
     slide.title("Main question")
     bullet.list(list("Why have you selected this course?",
