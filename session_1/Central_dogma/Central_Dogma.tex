@@ -698,11 +698,13 @@ As always, this is a bit of an over-simplification.
       \draw[cdsColor, line width=4] (3,8) -- (4,8);
       \draw[cdsColor, line width=4] (9,8) -- (10,8);
       \draw[cdsColor, line width=4] (13,8) -- (16,8);
+      \node[right] at (15.75,8) {\tiny AAAAAAAA...};
       
       \draw[cdsColor, line width=4] (7,6) -- (12,6);
       \draw[|-|] (7,6) -- (8,6);
       \draw[|-|] (8,6) -- (9,6);
       \draw[|-|] (9,6) -- (12,6);
+      \node[right] at (11.75,6) {\tiny AAAAAAAA...};
       
       \draw [dotted] (3,8) -- (7,6);
       \draw [dotted] (4,8) -- (8,6);
@@ -712,15 +714,18 @@ As always, this is a bit of an over-simplification.
       \draw [dotted] (16,8) -- (12,6);
       
       \node [left, align=left, font=\footnotesize] at (4,7) {splicing};
+      \node [right, font=\footnotesize] at (14.5,7) {poly-adenylation};
     }
 
     \visible<6>{
       \draw[cdsColor, line width=4] (7,6) -- (12,6);
+      \node[right] at (11.75,6) {\tiny AAAAAAAA...};
       \riboS[0.5]{7}{6};
     }
 
     \visible<7>{
       \draw[cdsColor, line width=4] (2,6) -- (7,6);
+      \node[right] at (6.75,6) {\tiny AAAAAAAA...};
       \protein{6}{5};
       \riboS[0.5]{7}{6};
     }
@@ -730,15 +735,16 @@ As always, this is a bit of an over-simplification.
 
 \begin{frame}{Eukaryotes \& Prokaryotes}
   \begin{columns}
-    \begin{column}{0.5\textwidth}
+    \begin{column}[T]{0.5\textwidth}
       \subHeading{Eukaryotes}
       \begin{itemize}
       \item One transcript containing introns and exons
       \item Introns removed and exons combined by splicing
+      \item Enzymatic (non-template) addition of As at 3' end
       \item One protein produced
       \end{itemize}
     \end{column}
-    \begin{column}{0.5\textwidth}
+    \begin{column}[T]{0.5\textwidth}
       \subHeading{Prokaryotes}
       \begin{itemize}
         \item One transcript containing several open reading frames
