@@ -4,3 +4,4 @@
 *.fq filter=lfs diff=lfs merge=lfs -text
 *.sam filter=lfs diff=lfs merge=lfs -text
 *.bam filter=lfs diff=lfs merge=lfs -text
+*.odp filter=lfs diff=lfs merge=lfs -text
