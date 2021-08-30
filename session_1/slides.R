@@ -157,7 +157,7 @@ slides[[11]] <- function(){
                     c("Genomes & transcriptomes", "Structure and other properties"))
     tmp <- plotTable(10, 90, topics, c.widths=c(15, 45), column.bg=c(rgb(0.8, 0.8, 0.8,0.3), rgb(0.9, 0.9, 0.9,0.3)),
                      row.bg=c(rgb(0,0,0,0), rgb(0.5,0.5,0.5,0.2)),
-                     text.col=c(blue, 'black'), text.adj=rbind(c(0,1), c(0,1)), font=c(2,1), cex=2.25, family="Arial",
+                     text.col=c(blue, 'black'), text.adj=rbind(c(0,1), c(0,1)), font=c(2,1), cex=2, family="Arial",
                      row.margin=2)
     sc.text( "With adjustments along the way if necessary", 5, 5, cex=1.5, adj=c(0,0))
     NULL
@@ -257,7 +257,7 @@ slides[[16]] <- function(){
     col.bg <- NA
     tmp <- plotTable(5, 95, ttable, c.widths=c(5, 5, 5, 5, 45), column.bg=NA,
                      row.bg=row.bg,
-                     text.adj=c(0,1), cex=1.5, family="Arial",
+                     text.adj=c(0,1), cex=1.25, family="Arial",
                      row.margin=1)
     segments(tmp$l[1], tmp$b[1], max(tmp$r), col='black', lwd=2)
     NULL
