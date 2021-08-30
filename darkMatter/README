@@ -1,0 +1,13 @@
+# Data and descriptions for the dark matter practical work
+
+Make sure to use git lfs for fasta, fastq, sam, bam and other large
+file types. (See .gitattributes).
+
+To add a new file type:
+
+```sh
+git lfs track "*.<ext>"
+```
+
+where <ext> is the file extension used in the project.
+

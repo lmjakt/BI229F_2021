@@ -1,4 +1,4 @@
-i <- 0
+with(parent.frame(2), print( ls() ))
 
 slides[[1]] <- function(){
     new.slide()
