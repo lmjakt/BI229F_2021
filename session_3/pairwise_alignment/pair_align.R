@@ -4,13 +4,12 @@
 ## The arguments to the function are:
 ##
 ## 1. score: the score matrix
-## 2. ptr : the pointer matrix
-## 3. seq: a list of two character vectors
-## 4. sm: a substitution matrix. This should have colnames and rownames so that\
+## 2. seq: a list of two character vectors
+## 3. sm: a substitution matrix. This should have colnames and rownames so that\
 ##        scores can be directly looked up.
-## 5. gap: The gap penalty. (This function does not calculate affine gap penalties)
+## 4. gap: The gap penalty. (This function does not calculate affine gap penalties)
 ##       Note that gap should be negative...
-## 6 & 7. i and j, the row and column of the score to be calculated
+## 5 & 6. i and j, the row and column of the score to be calculated
 ##
 ## The function will return a vector of two values: the score and the ptr where
 ## ptr values indicate:
@@ -23,7 +22,7 @@
 ## ncol = length(seq[2]) + 2
 ## residues in either sequence that are not given in the subsitution matrix will not 
 
-nm.cell <- function(score, ptr, seq, sm, gap, i, j){
+nm.cell <- function(score, seq, sm, gap, i, j){
     ## special rules for first column and row:
     if(i == 1 && j == 1)
         return(c(0, 0))
