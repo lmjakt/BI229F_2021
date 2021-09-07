@@ -139,8 +139,10 @@ slides[[8]] <- function(){
     exhaustive.align <- function(x, y, a, b, dx, dy, al.a, al.b, al.m, cex, family="Mono"){
         if(!length(a) && !length(b))
             return()
+        get.input()
         h <- strheight( paste(rep("A", 4), collapse="\n"), cex=cex, family=family )
-        if(length(a) && length(b) ){
+        w  <- strwidth("A", cex=cex, family=family)
+        if(length(a) && length(b)){
             al.a <- paste(al.a, c(a[1], a[1], "-"), sep="")
             al.b <- paste(al.b, c("-", b[1], b[1]), sep="")
             if(a[1] == b[1]){
@@ -148,19 +150,19 @@ slides[[8]] <- function(){
             }else{
                 al.m <- paste(al.m, c(" ", "x", " "), sep="")
             }
-        }
-        if(length(a) && !length(b)){
-            al.a <- paste(al.a, c(a[1], a[1], "-"), sep="")
-            al.b <- paste(al.b, c("-", "-", "-"), sep="")
             text(x, y+h, paste(al.a[1], al.m[1], al.b[1], sep="\n"), cex=cex, family=family, adj=c(0,0.5))
             text(x, y, paste(al.a[2], al.m[2], al.b[2], sep="\n"), cex=cex, family=family, adj=c(0,0.5))
             text(x, y-h, paste(al.a[3], al.m[3], al.b[3], sep="\n"), cex=cex, family=family, adj=c(0,0.5))
-            tw <- 1.1 * strwidth(al.a[2], cex=cex, family=family)
-            arrows(x+tw, y, x+dx-tw, y, length=0.1)
-            arrows(x+tw, y+h, x+dx-tw, y+dy, length=0.1)
-            arrows(x+tw, y-h, x+dx-tw, y-dy, length=0.1)
-            exhaustive.align(x+dx, y, a[-1], b[-1], dx, dy/3, al.a[2], al.b[2], al.m[2], cex=cex, family=family)
+            tw <- strwidth(al.a[2], cex=cex, family=family) + w
+            if(length(a) > 1 || length(b) > 1){
+                arrows(x+tw, y, x+dx-w, y, length=0.1)
+##            if(length(a) > 1)
+                arrows(x+tw, y+h, x+dx-w, y+dy, length=0.1)
+##            if(length(b) > 1)
+                arrows(x+tw, y-h, x+dx-w, y-dy, length=0.1)
+            }
             exhaustive.align(x+dx, y+dy, a[-1], b, dx, dy/3, al.a[1], al.b[1], al.m[1], cex=cex, family=family)
+            exhaustive.align(x+dx, y, a[-1], b[-1], dx, dy/3, al.a[2], al.b[2], al.m[2], cex=cex, family=family)
             exhaustive.align(x+dx, y-dy, a, b[-1], dx, dy/3, al.a[3], al.b[3], al.m[3], cex=cex, family=family)
             return()
         }
@@ -168,30 +170,30 @@ slides[[8]] <- function(){
             al.a <- paste(al.a, a[1], sep="")
             al.b <- paste(al.b, "-", sep="")
             al.m <- paste(al.m, " ")
-            tw <- 1.1 * strwidth(al.a, cex=cex, family=family)
+            tw <- strwidth(al.a, cex=cex, family=family) + w
             text(x, y, paste(al.a, al.m, al.b, sep="\n"), cex=cex, family=family, adj=c(0,0.5))
-            arrows(x+tw, y, x+dx-tw, y, length=0.1)
-            exhaustive.align(x+dx, y, a[-1], b, dx, dy/3, al.a[1], al.b[1], al.m[1], cex=cex, family=family)
+            if(length(a) > 1)
+                arrows(x+tw, y, x+dx-w, y, length=0.1)
+            exhaustive.align(x+dx, y, a[-1], c(), dx, dy/3, al.a, al.b, al.m, cex=cex, family=family)
             return()
         }
         if(length(b)){
             al.a <- paste(al.a, "-", sep="")
             al.b <- paste(al.b, b[1], sep="")
             al.m <- paste(al.m, " ")
-            tw <- 1.1 * strwidth(al.a, cex=cex, family=family)
+            tw <- strwidth(al.a, cex=cex, family=family) + w
             text(x, y, paste(al.a, al.m, al.b, sep="\n"), cex=cex, family=family, adj=c(0,0.5))
-            arrows(x+tw, y, x+dx-tw, y, length=0.1)
-            exhaustive.align(x+dx, y, a, b[-1], dx, dy/3, al.a[3], al.b[3], al.m[3], cex=cex, family=family)
+            if(length(b) > 1)
+                arrows(x+tw, y, x+dx-w, y, length=0.1)
+            exhaustive.align(x+dx, y, c(), b[-1], dx, dy/3, al.a, al.b, al.m, cex=cex, family=family)
             return()
         }
     }
-    seq <- c("ACTA", "ATTA")
+    seq <- c("ACT", "ATT")
     seq.sp <- strsplit(seq, "")
-    exhaustive.align(5, 50, seq.sp[[1]], seq.sp[[2]], 5, 30, "", "", "", 0.5)
+    exhaustive.align(0, 50, seq.sp[[1]], seq.sp[[2]], 8, 30, "", "", "", 1)
 }
 
-cairo_pdf("test.pdf", width=16, height=10)
-
+cairo_pdf("test.pdf", width=20, height=256)
 slides[[8]]()
-
 dev.off()
