@@ -77,7 +77,7 @@ nm.align <- function(seq, sm, gap){
     ## then go through and assign
     for(i in 1:nrow(scores)){
         for(j in 1:ncol(scores)){
-            nm <- nm.cell(scores, ptr, seq.l, sm, gap, i, j)
+            nm <- nm.cell(scores, seq.l, sm, gap, i, j)
             scores[i,j] <- nm[1]
             ptr[i,j] <- nm[2]
         }

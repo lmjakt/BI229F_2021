@@ -5,6 +5,7 @@ source("~/R/presentR/presentR.R")
 source("~/R/drawinR/drawing_functions.R")
 source("~/R/ncbi_R/ncbi_functions.R")
 source("~/R/codeR/colorise_R.R")
+source("pairwise_alignment/pair_align.R")
 
 blue <- rgb(0,0,0.75)
 green <- rgb(0, 0.75, 0)
@@ -14,6 +15,11 @@ bul.y <- 80
 bul.cex <- c(3,2,1.5)
 
 sub.y <- 90
+
+grid <- function(v=seq(0,100,10), h=v){
+    abline(h=h, lty=3)
+    abline(v=v, lty=3)
+}
 
 slide.title <- function(txt, cex=4, at=0, adj=0, col=blue, ...){
     ## adjust cex if too wide
@@ -37,6 +43,8 @@ par(mfrow=c(1,1))
 par(oma=c(0,0,0,0))
 draw.slides( slides )
 
+
+## just a check
 new.slide()
 tmp <- function(x, y, dx, dy, level, max.level){
     print(paste(level, max.level))

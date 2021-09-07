@@ -19,7 +19,7 @@ slides[[2]] <- function(){
 
 slides[[3]] <- function(){
     new.slide()
-    slide.title("No clear answer:")
+    slide.title("Alignment (gap insertion) required:")
     x <- c(5, 50)
     y <- c(85, 60, 35)
     family <- "Mono"
@@ -132,7 +132,292 @@ slides[[7]] <- function(){
                 x=bul.x, y=bul.y, t.cex=bul.cex)
 }
 
+
 slides[[8]] <- function(){
+    new.slide()
+    slide.title("Why align?")
+    t.cex <- 2.5
+    text(bul.x, 85, "To determine the similarity of two sequences", adj=c(0,0), cex=t.cex)
+    y1 <- 81
+    y2 <- 79
+    segments( c(10, 10), c(y1, y2), c(92, 92), lty=2 )
+    segments(c(10, 60, 14, 51), c(y1, y1, y2, y2), c(50, 90, 40, 92), col=c(blue, blue, red, red), lwd=4, lend=2)
+    id.x <- c( 14:20,23,27:40, 60:66,70,73,76,80:90 )
+    segments( id.x, y1, id.x, y2 )
+    get.input()
+    rect( c(14, 27, 60, 80), y1, c(20, 40, 66, 90), y2, lwd=2, col=rgb(0.6, 0.6, 0.6, 0.5) )
+    text(bul.x, 74, "To identify similar (conserved) regions. Likely to have function.", adj=c(0,0), cex=t.cex)
+    get.input()
+    bullet.list(list("Functional Analyses",
+                     list("Function of a protein (homology / paralogy)", "Important regions"),
+                     "Phylogenetic analyses",
+                     list("Evolutionary divergence", "Basis for tree building")), x=bul.x, y=60, t.cex=bul.cex)
+}
+
+slides[[9]] <- function(){
+    new.slide()
+    slide.title("Why align?")
+    t.cex <- 2.5
+    text(bul.x, 90, "Map locations of short sequences to genomes", adj=c(0,0), cex=t.cex)
+    y1 <- 81
+    segments( 10, y1, 95, y1, col=blue, lwd=4, lend=2)
+    sl <- 3
+    s.1 <- 18
+    short.x <- c(cumsum(c(s.1, sl+1, sl+1, sl+1)), cumsum(c(s.1+2, sl+1, sl+1, sl+1)), cumsum(c(s.1+3, sl+1, sl+1)))
+    short.y <- c(rep(y1-2, 4), rep(y1-3, 4), rep(y1-4, 3))
+    segments( short.x, short.y, short.x+sl, col=red, lwd=4)
+    s.1 <- 60
+    short.x <- c(cumsum(c(s.1, sl+1, sl+1, sl+1)), cumsum(c(s.1+2, sl+1, sl+1, sl+1)), cumsum(c(s.1+3, sl+1, sl+1)))
+    short.y <- c(rep(y1-2, 4), rep(y1-3, 4), rep(y1-4, 3))
+    segments( short.x, short.y, short.x+sl, col=red, lwd=4)
+    bullet.list(list("Identify expressed regions",
+                     "Estimate expression from RNA-seq", "Identify sequence variants",
+                     "Identify amplified regions", "Evaluate primers and probes", "..."),
+                x=bul.x, y=60, t.cex=bul.cex)
+}    
+
+
+dot.plot <- function(seq, x, y, window, cell.margin=1.2, ...){
+    ch <- cell.margin * strheight("A", ...)
+    cw <- cell.margin * strwidth("A", ...)
+    seq.c <- strsplit(seq, "")
+    c.y <- y - cumsum(rep(ch, length(seq.c[[1]])))
+    c.x <- x + cumsum(rep(cw, length(seq.c[[2]])))
+    l.x <- c(x, c.x) + cw/2
+    l.y <- c(y, c.y) - ch/2
+    text( x, c.y, seq.c[[1]], ... )
+    text( c.x, y, seq.c[[2]], ... )
+    segments(l.x, min(l.y), l.x, max(l.y))
+    segments(min(l.x), l.y, max(l.x), l.y)
+    if(window == 0){
+        return(invisible(list(cx=c.x, cy=c.y, lx=l.x, ly=l.y, ch=ch, cw=cw)))
+    }
+    get.input()
+    for(row in 1:(nchar(seq[1])+1-window)){
+        for(column in 1:(nchar(seq[2])+1-window)){
+            s1 <- substring(seq[1], row, row+window-1)
+            s2 <- substring(seq[2], column, column+window-1)
+            if(s1 == s2)
+                rect(l.x[column:(column+window-1)], l.y[row:(row+window-1)],
+                     l.x[(column+1):(column+window)], l.y[(row+1):(row+window)], col=rgb(0.8, 0, 0, 0.5))
+        }
+    }
+    invisible(list(cx=c.x, cy=c.y, lx=l.x, ly=l.y, ch=ch, cw=cw))
+}
+
+slides[[10]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "Visualising the alignment space", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos1 <- dot.plot(seq, x1, y, window=1, cex=3, family="Mono")
+    text(mean(pos1$cx), min(pos1$ly)-pos1$ch, "window=1", adj=c(0.5, 1), cex=2.5)
+    get.input()
+    pos2 <- dot.plot(seq, max(pos1$lx+x1), y, window=2, cex=3, family="Mono")
+    text(mean(pos2$cx), min(pos2$ly)-pos2$ch, "window=2", adj=c(0.5, 1), cex=2.5)
+    get.input()
+    pos3 <- dot.plot(seq, max(pos2$lx+x1), y, window=3, cex=3, family="Mono")
+    text(mean(pos3$cx), min(pos3$ly)-pos3$ch, "window=3", adj=c(0.5, 1), cex=2.5)
+}
+
+slides[[11]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos1 <- dot.plot(seq, x1, y, window=3, cex=3, family="Mono")
+    text(mean(pos1$cx), min(pos1$ly)-pos1$ch, "window=3", adj=c(0.5, 1), cex=2.5)
+    get.input()
+    with(pos1, arrows(cx[1], cy[1], cx[3], cy[3], lwd=2))
+    with(pos1, arrows(cx[4], cy[6], cx[6], cy[8], lwd=2))
+    with(pos1, arrows(cx[9], cy[9], cx[12], cy[12], lwd=2))
+    get.input()
+    with(pos1, arrows(cx[3], cy[4], cx[3], cy[5], lwd=2))
+    with(pos1, arrows(cx[7], cy[9], cx[8], cy[9], lwd=2))
+###
+    get.input()
+    text(max(pos1$lx)+5, 60,
+         "ACG--TACGATAGA\n|||  |||  ||||\nACGGATAC--TAGA",
+         cex=3, adj=c(0,0), family="Mono")
+    get.input()
+    with(pos1, arrows(max(lx)+5, 55, max(lx)+5+cw, 55, lwd=2))
+    with(pos1, text( max(lx)+5+cw, 55, "Gap inserted into vertical sequence", cex=2, pos=4))
+    with(pos1, arrows(max(lx)+5, 50, max(lx)+5, 50-ch, lwd=2))
+    with(pos1, text(max(lx)+5+cw, 50-ch/2, "Gap inserted into horizontal sequence", cex=2, pos=4))
+    with(pos1, arrows(max(lx)+5, 43, max(lx)+5+cw, 43-ch, lwd=2))
+    with(pos1, text(max(lx)+5+cw, 43-ch/2, "character added from both sequences", cex=2, pos=4))
+}
+
+slides[[12]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
+    pos.l <- max(pos$lx)
+    text( pos.l + 5, 70, "What is the optimal alignment\nto position 1,1 in the matrix?", cex=2, pos=4 )
+    with(pos, rect(lx[1], ly[1], lx[2], ly[2], col=rgb(0.5, 0, 0, 0.5)))
+    text( pos.l + 5, 60, "-   A   A\nA   A   -", cex=2, family="Mono", pos=4)
+    get.input()
+    text( pos.l + 5, 50, "What is the optimal alignment\nto position 1,2 in the matrix?", cex=2, pos=4 )
+    with(pos, rect(lx[2], ly[1], lx[3], ly[2], col=rgb(0.5, 0, 0, 0.5)))
+    text( pos.l + 5, 40, "AC   AC   AC\n-A   A-   --", cex=2, family="Mono", pos=4)
+    get.input()
+    text( pos.l + 5, 30, "What is the optimal alignment\nto position 2,2 in the matrix?", cex=2, pos=4 )
+    with(pos, rect(lx[2], ly[2], lx[3], ly[3], col=rgb(0.5, 0, 0, 0.5)))
+    text( pos.l + 5, 25, "depends on scores in (1,1), (1,2), (2,1)", cex=2, pos=4, font=3)
+    with(pos, arrows( cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[1], cy[2], cy[1]), lwd=2))
+}
+
+slides[[13]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
+    pos.l <- max(pos$lx)
+    text( pos.l + 5, 70, "What is the optimal alignment\nto position 2,2 in the matrix?", cex=2, pos=4 )
+    with(pos, rect(lx[2], ly[2], lx[3], ly[3], col=rgb(0.5, 0, 0, 0.5)))
+    with(pos, arrows( cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[1], cy[2], cy[1]), lwd=2))
+    text( pos.l + 5, 56, "The optimal alignment to position (2,2)\nmust include one of:",
+         cex=2, pos=4, font=3)
+    bullet.list(list("optimal alignment to (1,2)", "optimal alignment to (1,1)", "optimal alignment to (2,1)"),
+                t.cex=2, bullet=FALSE, x=pos.l+5, 50)
+}
+
+slides[[14]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
+    pos.l <- max(pos$lx)
+    text( pos.l + 5, 70, "What is the score of the optimal\nalignment to position 2,2 in the matrix?", cex=2, pos=4 )
+    with(pos, rect(lx[2], ly[2], lx[3], ly[3], col=rgb(0.5, 0, 0, 0.5)))
+    with(pos, arrows( cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[1], cy[2], cy[1]), lwd=2))
+    text( pos.l + 5, 56, "The optimal score at position (2,2)\nmust be one of:",
+         cex=2, pos=4, font=3)
+    bullet.list(list("optimal score at (1,2) + ?", "optimal score at (1,1) + ?", "optimal score at (2,1) + ?"),
+                t.cex=2, bullet=FALSE, x=pos.l+5, 50)
+    get.input()
+    sc.text("Right and left moves introduce gaps\nDiagonal moves align residues to each other", cex=2.5, x=x1, y=15, adj=c(0,0))
+}
+
+slides[[15]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
+    pos.l <- max(pos$lx)
+    text( pos.l + 5, 70, "What is the score of the optimal\nalignment to position 2,2 in the matrix?", cex=2, pos=4 )
+    with(pos, rect(lx[2], ly[2], lx[3], ly[3], col=rgb(0.5, 0, 0, 0.5)))
+    with(pos, arrows( cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[1], cy[2], cy[1]), lwd=2))
+    text( pos.l + 5, 56, "The optimal score at position (2,2)\nis the maximum of:",
+         cex=2, pos=4, font=3)
+    bullet.list(list("optimal score at (1,2) + gap",
+                     "optimal score at (1,1) + match/mismatch", "optimal score at (2,1) + gap"),
+                t.cex=2, bullet=FALSE, x=pos.l+5, 50)
+    get.input()
+    sc.text("This is the basis for sequence alignment by dynamic programming", cex=2.5, x=x1, y=15, adj=c(0,0))
+}
+
+slides[[16]] <- function(){
+    new.slide()
+    slide.title("How to determine an alignment")
+    sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    y <- 75
+    x1 <- 5
+    pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
+    pos.l <- max(pos$lx)
+    text( pos.l + 5, 70, "What is the score of the optimal\nalignment to position i,j in the matrix?", cex=2, pos=4 )
+    i <- 8
+    j <- 7
+    with(pos, rect(lx[j], ly[i], lx[j+1], ly[i+1], col=rgb(0.5, 0, 0, 0.5)))
+    with(pos, arrows( cx[j], cy[i], c(cx[j], cx[j-1], cx[j-1]), c(cy[i-1], cy[i-1], cy[i]), lwd=2))
+    text( pos.l + 5, 56, "The optimal score at position (i,j)\nis the maximum of:",
+         cex=2, pos=4, font=3)
+    bullet.list(list("optimal score at (i-1,j) + gap",
+                     "optimal score at (i-1,j-1) + match/mismatch", "optimal score at (i,j-1) + gap"),
+                t.cex=2, bullet=FALSE, x=pos.l+5, 50)
+    get.input()
+    sc.text("This is the Needleman-Wunsch equation", cex=2.5, x=x1, y=15, adj=c(0,0))
+}
+
+dna.sm <- diag(4, 4, 4)
+dna.sm[ dna.sm == 0 ] <- -4
+rownames(dna.sm) <- c("A", "C", "T", "G")
+colnames(dna.sm) <- rownames(dna.sm)
+
+## pos is a list returned by dot.plot()
+draw.arrows <- function(pos, ptr, i, j, length=0.1, ...){
+    x1 <- ifelse(bitwAnd(1, ptr[i,j]), pos$cx[j] - pos$cw/4, pos$cx[j])
+    y1 <- ifelse(bitwAnd(2, ptr[i,j]), pos$cy[i] + pos$ch/4, pos$cy[i])
+    x2 <- ifelse(bitwAnd(1, ptr[i,j]), x1 - pos$cw/2, x1)
+    y2 <- ifelse(bitwAnd(2, ptr[i,j]), y1 + pos$ch/2, y1)
+    arrows(x1, y1, x2, y2, length=length, ...)
+}
+
+trace.ptr <- function(pos, ptr, i, j, col=rgb(0.5, 0.5, 0, 0.5)){
+    with(pos, rect(lx[j], ly[i], lx[j+1], ly[j+1], col=col))
+    i2 <- ifelse(bitwAnd(1, ptr[i,j]), i-1, i)
+    j2 <- ifelse(bitwAnd(2, ptr[i,j]), j-1, j)
+    c(i2, j2)
+}
+
+slides[[17]] <- function(){
+    new.slide()
+    slide.title("The Needleman-Wunsch algorithm")
+    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    nm <- nm.align( seq, dna.sm, -8 )
+    pos <- dot.plot( paste(" ", seq, sep=""), 10, 80, window=0, cex=3, family="Mono")
+    ##    pos1 <- dot.plot( paste(" ", seq, sep=""), 10, 80, window=0, cex=2, family="Mono")
+    pos.l <- max(pos$lx) + 5
+    ch <- strheight("A", cex=2)
+    bullet.list(list("Set up a score matrix with an additional row and column",
+                     "Set the score at (1,1) to 0",
+                     "Fill the first row and column with gap penalties",
+                     "Cell by cell:",
+                     list("Determine maximum score",
+                          "Record score",
+                          "Record the cell from which the alignment was extended"),
+                     "Trace alignment from bottom right to top left"
+                     ),
+                bullet=FALSE, t.cex=c(2.5,2), x=pos.l, y=80)
+    get.input()
+    text(pos$cx, pos$cy[1], nm$sc[1,], cex=1)
+    text(pos$cx[1], pos$cy, nm$sc[,1], cex=1)
+    draw.arrows( pos, nm$pt, 1, 2:ncol(nm$pt), col=red)
+    draw.arrows( pos, nm$pt, 2:nrow(nm$pt), 1, col=red)
+    get.input()
+    text(pos$cx[-1], pos$cy[2], nm$sc[2,-1], cex=1)
+    draw.arrows( pos, nm$pt, 2, 2:ncol(nm$pt), col=red)
+    get.input()
+    for(i in 3:nrow(nm$pt)){
+        text(pos$cx[-1], pos$cy[i], nm$sc[i,-1], cex=1)
+        draw.arrows( pos, nm$pt, i, 2:ncol(nm$pt), col=red)
+    }
+    cell <- c(nrow(nm$pt), ncol(nm$pt))
+    while(sum(cell) > 2){
+        cat(cell, "\n")
+        cell <- trace.ptr( pos, nm$pt, cell[1], cell[2])
+    }
+}
+
+extra.slide <- function(){
     new.slide()
     slide.title("Finding optimal alignments")
     ## only works if length(a) == length(b)
