@@ -271,7 +271,7 @@ slides[[12]] <- function(){
     get.input()
     text( pos.l + 5, 30, "What is the optimal alignment\nto position 2,2 in the matrix?", cex=2, pos=4 )
     with(pos, rect(lx[2], ly[2], lx[3], ly[3], col=rgb(0.5, 0, 0, 0.5)))
-    text( pos.l + 5, 25, "depends on scores in (1,1), (1,2), (2,1)", cex=2, pos=4, font=3)
+    text( pos.l + 5, 22, "depends on scores in (1,1), (1,2), (2,1)", cex=2, pos=4, font=3)
     with(pos, arrows( cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[1], cy[2], cy[1]), lwd=2))
 }
 
@@ -310,7 +310,7 @@ slides[[14]] <- function(){
     bullet.list(list("optimal score at (1,2) + ?", "optimal score at (1,1) + ?", "optimal score at (2,1) + ?"),
                 t.cex=2, bullet=FALSE, x=pos.l+5, 50)
     get.input()
-    sc.text("Right and left moves introduce gaps\nDiagonal moves align residues to each other", cex=2.5, x=x1, y=15, adj=c(0,0))
+    sc.text("Right and left moves introduce gaps\nDiagonal moves align residues to each other", cex=2.5, x=x1, y=1, adj=c(0,0))
 }
 
 slides[[15]] <- function(){
@@ -331,7 +331,7 @@ slides[[15]] <- function(){
                      "optimal score at (1,1) + match/mismatch", "optimal score at (2,1) + gap"),
                 t.cex=2, bullet=FALSE, x=pos.l+5, 50)
     get.input()
-    sc.text("This is the basis for sequence alignment by dynamic programming", cex=2.5, x=x1, y=15, adj=c(0,0))
+    sc.text("This is the basis for sequence alignment by dynamic programming", cex=2.5, x=x1, y=1, adj=c(0,0))
 }
 
 slides[[16]] <- function(){
@@ -354,7 +354,7 @@ slides[[16]] <- function(){
                      "optimal score at (i-1,j-1) + match/mismatch", "optimal score at (i,j-1) + gap"),
                 t.cex=2, bullet=FALSE, x=pos.l+5, 50)
     get.input()
-    sc.text("This is the Needleman-Wunsch equation", cex=2.5, x=x1, y=15, adj=c(0,0))
+    sc.text("This is the Needleman-Wunsch equation", cex=2.5, x=x1, y=1, adj=c(0,0))
 }
 
 dna.sm <- diag(4, 4, 4)
@@ -415,6 +415,7 @@ slides[[17]] <- function(){
         cat(cell, "\n")
         cell <- trace.ptr( pos, nm$pt, cell[1], cell[2])
     }
+    sc.text("End of new presentation. Move to old one.", x=10, y=1, cex=2, adj=c(0,0))
 }
 
 extra.slide <- function(){
