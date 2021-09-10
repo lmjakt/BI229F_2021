@@ -1,5 +1,11 @@
+## The dark matter presentation in R
+
+
 ## we may want to print out the studens names:
+## an external dependancy! Sorry about that. The code though
+## can be found on github if you know how to look for it.
 source("~/R/drawinR/drawing_functions.R")
+
 
 grid  <- function(v=seq(0, 100, 10), h=v, lty=3, ...){
     abline(v=v, lty=lty)

@@ -1,3 +1,5 @@
+## Example code that translates DNA sequences to amino acid sequences
+
 
 AAs  <- "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG"
 Starts <- "---M------**--*----M---------------M----------------------------"
