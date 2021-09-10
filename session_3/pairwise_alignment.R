@@ -10,10 +10,19 @@ source("pairwise_alignment/pair_align.R")
 blue <- rgb(0,0,0.75)
 green <- rgb(0, 0.75, 0)
 red <- rgb(0.75, 0, 0)
+black <- rgb(0, 0, 0)
+purple <- rgb(0.6, 0, 0.6)
+grey <- rgb(0.5, 0.5, 0.5, 0.5)
 pyel <- rgb(0.5, 0.5, 0, 0.5)
+pgrey <- rgb(0.5, 0.5, 0.5, 0.5)
+pcyan <- rgb(0, 0.5, 0.5, 0.5)
 bul.x <- 10
 bul.y <- 80
 bul.cex <- c(3,2,1.5)
+
+nuc.col <- c(A=blue, C=green, G=red, T=purple, "-"=black)
+nuc.black <- c(A=black, C=black, G=black, T=black, "-"=black)
+nuc.bg <- c(A=rgb(0,0,0.8,0.3), C=rgb(0,0.8,0,0.3), G=rgb(0.8,0,0,0.3), T=rgb(0.6,0,0.6,0.3), "-"=rgb(0.5,0.5,0.5,0.4))
 
 sub.y <- 90
 
