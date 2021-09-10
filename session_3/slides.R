@@ -1,3 +1,33 @@
+draw.aligns <- function(al, y1, y2, h1, cols, sp.a=NULL, sp.b=NULL, w.radius=4, w.sd=w.radius/2, sim.h=h1*0.75, sim.sep=h1*0.125,
+                        sim.pos=c(1,1), border=cols){
+    krn <- dnorm( -w.radius:w.radius, sd=w.sd )
+    a.seq <- strsplit( al$seq[1], '' )[[1]]
+    b.seq <- strsplit( al$seq[2], '' )[[1]]
+    sim <- sapply( 1:length(a.seq), function(i){
+        b <- ifelse( i > w.radius, i - w.radius, 1 )
+        e <- ifelse( i + w.radius <= length(a.seq), i + w.radius, length(a.seq) )
+        k.b <- 1 + w.radius - (i-b)
+        k.e <- 1 + w.radius + (e-i)
+        sum( as.numeric(a.seq[b:e] == b.seq[b:e]) * krn[k.b:k.e] ) / sum(krn[k.b:k.e])
+    })
+    ## then draw our rectangles using the colours specified
+    x2 <- 1:length(a.seq)
+    x1 <- x2 - 1
+    rect(x1, y1, x2, y1+h1, col=cols[ a.seq ], border=border[a.seq])
+    rect(x1, y2, x2, y2+h1, col=cols[ b.seq ], border=border[b.seq])
+    ## then we plot the similarity beneath y1, and at 
+    ## sim always has a maximum of 1.
+    sim.y.base <- ifelse( sim.pos[1] == 1, y1, y2 )
+    sim.y <- sim.y.base + ifelse( sim.pos[2] == 1,  -(sim.h + sim.sep), (h1 + sim.sep) )
+    lines( (x1+x2)/2, sim.y + sim * sim.h )
+    segments( 0.5, sim.y, length(a.seq)-0.5, sim.y )
+    segments( (x1+x2)/2, sim.y, (x1+x2)/2, sim.y + ifelse( a.seq == b.seq, sim * sim.h, 0 ) )
+    if(!is.null(sp.a) || !is.null(sp.b))
+        text( 0, y2, paste(sp.a, "vs", sp.b), adj=c(0,1.2) )
+}
+
+## define some sequences that we can use:
+ex.seqs <- c("ACGGATACTAGA", "ACGTACGATAGA")
 
 slides[[1]] <- function(){
     new.slide()
@@ -177,7 +207,7 @@ slides[[9]] <- function(){
 }    
 
 
-dot.plot <- function(seq, x, y, window, cell.margin=1.2, ...){
+dot.plot <- function(seq, x, y, window, cell.margin=1.2, do.plot=TRUE, ...){
     ch <- cell.margin * strheight("A", ...)
     cw <- cell.margin * strwidth("A", ...)
     seq.c <- strsplit(seq, "")
@@ -185,11 +215,13 @@ dot.plot <- function(seq, x, y, window, cell.margin=1.2, ...){
     c.x <- x + cumsum(rep(cw, length(seq.c[[2]])))
     l.x <- c(x, c.x) + cw/2
     l.y <- c(y, c.y) - ch/2
-    text( x, c.y, seq.c[[1]], ... )
-    text( c.x, y, seq.c[[2]], ... )
-    segments(l.x, min(l.y), l.x, max(l.y))
-    segments(min(l.x), l.y, max(l.x), l.y)
-    if(window == 0){
+    if(do.plot){
+        text( x, c.y, seq.c[[1]], ... )
+        text( c.x, y, seq.c[[2]], ... )
+        segments(l.x, min(l.y), l.x, max(l.y))
+        segments(min(l.x), l.y, max(l.x), l.y)
+    }
+    if(window == 0 || !do.plot){
         return(invisible(list(cx=c.x, cy=c.y, lx=l.x, ly=l.y, ch=ch, cw=cw)))
     }
     get.input()
@@ -209,7 +241,7 @@ slides[[10]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "Visualising the alignment space", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2] ## c("ACGGATACTAGA", "ACGTACGATAGA")
     y <- 75
     x1 <- 5
     pos1 <- dot.plot(seq, x1, y, window=1, cex=3, family="Mono")
@@ -226,7 +258,7 @@ slides[[11]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2]
     y <- 75
     x1 <- 5
     pos1 <- dot.plot(seq, x1, y, window=3, cex=3, family="Mono")
@@ -256,7 +288,7 @@ slides[[12]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2]
     y <- 75
     x1 <- 5
     pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
@@ -279,7 +311,7 @@ slides[[13]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2]
     y <- 75
     x1 <- 5
     pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
@@ -297,7 +329,7 @@ slides[[14]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2]
     y <- 75
     x1 <- 5
     pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
@@ -317,7 +349,7 @@ slides[[15]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2]
     y <- 75
     x1 <- 5
     pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
@@ -338,7 +370,7 @@ slides[[16]] <- function(){
     new.slide()
     slide.title("How to determine an alignment")
     sc.text( "How to choose a path through the matrix", x=bul.x, y=90, cex=3, adj=c(0,0))
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
+    seq <- ex.seqs[1:2]
     y <- 75
     x1 <- 5
     pos <- dot.plot(seq, x1, y, window=0, cex=3, family="Mono")
@@ -378,11 +410,13 @@ trace.ptr <- function(pos, ptr, i, j, col=rgb(0.5, 0.5, 0, 0.5)){
     c(i2, j2)
 }
 
+nmw.1 <- nm.align(ex.seqs[1:2], dna.sm, -8)
+
 slides[[17]] <- function(){
     new.slide()
     slide.title("The Needleman-Wunsch algorithm")
-    seq <- c("ACGGATACTAGA", "ACGTACGATAGA")
-    nm <- nm.align( seq, dna.sm, -8 )
+    seq <- ex.seqs[1:2]
+    nm <- nmw.1
     pos <- dot.plot( paste(" ", seq, sep=""), 10, 80, window=0, cex=3, family="Mono")
     ##    pos1 <- dot.plot( paste(" ", seq, sep=""), 10, 80, window=0, cex=2, family="Mono")
     pos.l <- max(pos$lx) + 5
@@ -417,6 +451,209 @@ slides[[17]] <- function(){
     }
     sc.text("End of new presentation. Move to old one.", x=10, y=1, cex=2, adj=c(0,0))
 }
+
+slides[[18]] <- function(...){
+    new.slide(...)
+    slide.title("The Needleman-Wunsch algorithm")
+    seq <- ex.seqs[1:2]
+    nm <- nmw.1
+    pos <- dot.plot( paste(" ", seq, sep=""), 10, 80, window=0, cex=3, family="Mono")
+    ##    pos1 <- dot.plot( paste(" ", seq, sep=""), 10, 80, window=0, cex=2, family="Mono")
+    pos.r <- max(pos$lx) + 5
+    ch <- strheight("A", cex=2)
+    invisible(list(nm=nm, pos=pos, pos.r=pos.r, ch=ch))
+}
+
+slides[[19]] <- function(){
+    obj <- slides[[18]]()
+##    obj <- slides[[18]](clear = !int.dev())
+    nm <- nmw.1
+    al.x <- obj$pos.r + 5
+    ch <- strheight("A", cex=3)
+    cw <- strwidth("A", cex=3)
+    with(obj$pos, {
+        rect(lx[2], ly[1], lx[3], ly[2], col=pyel)
+        arrows(cx[2], cy[1], cx[1], cy[1], lwd=2)
+    })
+    get.input()
+    al.1 <- nm.extract(nm$pt, nm$seq, 1, 2)
+    al1.p <- draw.aligns( al.1, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al1.p$bottom + al1.p$top)/2, "1,2", cex=2)
+    ##
+    get.input()
+    with(obj$pos, {
+        rect(lx[1], ly[2], lx[2], ly[3], col=pyel)
+        arrows(cx[1], cy[2], cx[1], cy[1], lwd=2)
+    })
+    get.input()
+    al.2 <- nm.extract(nm$pt, nm$seq, 2, 1)
+    al2.p <- draw.aligns( al.2, al.x, al1.p$bottom - ch*4, cex=3, draw.char=TRUE, draw.rect=TRUE,
+                         bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al2.p$bottom + al2.p$top)/2, "2,1", cex=2)
+}
+
+slides[[20]] <- function(){
+    obj <- slides[[18]]()
+    nm <- nmw.1
+    al.x <- obj$pos.r + 5
+    ch <- strheight("A", cex=3)
+    cw <- strwidth("A", cex=3)
+    with(obj$pos, {
+        rect(lx[2], ly[1], lx[3], ly[2], col=pgrey)
+    })
+    al.1 <- nm.extract(nm$pt, nm$seq, 1, 2)
+    al1.p <- draw.aligns( al.1, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al1.p$bottom + al1.p$top)/2, "1,2", cex=2)
+    ##
+    with(obj$pos, {
+        rect(lx[1], ly[2], lx[2], ly[3], col=pgrey)
+    })
+    al.2 <- nm.extract(nm$pt, nm$seq, 2, 1)
+    al2.p <- draw.aligns( al.2, al.x, al1.p$bottom - ch*4, cex=3, draw.char=TRUE, draw.rect=TRUE,
+                         bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al2.p$bottom + al2.p$top)/2, "2,1", cex=2)
+    with(obj$pos, {
+        rect(lx[2], ly[2], lx[3], ly[3], col=pyel)
+        arrows(cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[2], cy[1], cy[1]), lwd=2, length=0.1)
+    })
+    yd <- al1.p$top - al2.p$top
+    text(al.x - cw*2, (al2.p$bottom + al2.p$top)/2 - yd, "1,1", cex=2)
+    ## manually construct as the nm.extract will only give use the best alignment
+    al.3 <- strsplit(c("-A", "A-"), "")
+    al.4 <- strsplit(c("A-", "-A"), "")
+    al.5 <- list("A", "A")
+    al.x <- al1.p$right + 5
+    get.input()
+    al3.p <- draw.aligns( al.3, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al4.p <- draw.aligns( al.4, al.x, al1.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al5.p <- draw.aligns( al.5, al.x, al2.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+}
+
+## this will work only if i and j are larger than 1
+extend.alignment <- function(obj, nm, i, j){
+    al.x <- obj$pos.r + 5
+    ch <- strheight("A", cex=3)
+    cw <- strwidth("A", cex=3)
+    with(obj$pos, {
+        rect(lx[j], ly[i], lx[j+1], ly[i+1], col=pyel)
+    })
+    get.input()
+    with(obj$pos, {
+        rect(lx[j-1], ly[i-1], lx[j], ly[i], col=pgrey)
+        rect(lx[j], ly[i-1], lx[j+1], ly[i], col=pgrey)
+        rect(lx[j-1], ly[i], lx[j], ly[i+1], col=pgrey)
+        arrows(cx[j], cy[i], c(cx[j-1], cx[j-1], cx[j]), c(cy[i], cy[i-1], cy[i-1]), length=0.1, lwd=2)
+    })
+    al.1 <- with(obj$pos, strsplit( nm.extract(nm$pt, nm$seq, i-1, j, cx, cy, length=0.1, col='red'), ""))
+    al.2 <- with(obj$pos, strsplit( nm.extract(nm$pt, nm$seq, i, j-1, cx, cy, length=0.1, col='red'), ""))
+    al.3 <- with(obj$pos, strsplit( nm.extract(nm$pt, nm$seq, i-1, j-1, cx, cy, length=0.1, col='red'), ""))
+    labs <- paste(c(i-1,i,i-1), c(j,j-1,j-1), sep=",")
+    al1.p <- draw.aligns( al.1, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al1.p$bottom + al1.p$top)/2, labs[1], cex=2)
+    al2.p <- draw.aligns( al.2, al.x, al1.p$bottom - ch*4, cex=3, draw.char=TRUE, draw.rect=TRUE,
+                         bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al2.p$bottom + al2.p$top)/2, labs[2], cex=2)
+    al3.p <- draw.aligns( al.3, al.x, al2.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al3.p$bottom + al3.p$top)/2, labs[3], cex=2)
+    ## to extend the alignment add a gap or appropriate character
+    al.1 <- list( c(al.1[[1]], nm$seq[[1]][i-1]), c(al.1[[2]], "-") )
+    al.2 <- list( c(al.2[[1]], "-"), c(al.2[[2]], nm$seq[[2]][j-1]) )
+    al.3 <- list( c(al.3[[1]], nm$seq[[1]][i-1]), c(al.3[[2]], nm$seq[[2]][j-1]) )
+    al.x <- al1.p$right + 5
+    get.input()
+    al3.p <- draw.aligns( al.1, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al4.p <- draw.aligns( al.2, al.x, al1.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al5.p <- draw.aligns( al.3, al.x, al2.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+}
+
+slides[[21]] <- function(){
+    obj <- slides[[18]]()
+    nm <- nmw.1
+    al.x <- obj$pos.r + 5
+    ch <- strheight("A", cex=3)
+    cw <- strwidth("A", cex=3)
+    with(obj$pos, {
+        rect(lx[3], ly[2], lx[4], ly[3], col=pyel)
+    })
+    get.input()
+    with(obj$pos, {
+        rect(lx[2], ly[1], lx[3], ly[2], col=pgrey)
+        rect(lx[3], ly[1], lx[4], ly[2], col=pgrey)
+        rect(lx[2], ly[2], lx[3], ly[3], col=pgrey)
+        arrows(cx[3], cy[2], c(cx[2], cx[2], cx[3]), c(cy[2], cy[1], cy[1]), length=0.1, lwd=2)
+    })
+    al.1 <- strsplit( nm.extract(nm$pt, nm$seq, 1, 3), "")
+    al.2 <- strsplit( nm.extract(nm$pt, nm$seq, 2, 2), "")
+    al.3 <- strsplit( nm.extract(nm$pt, nm$seq, 1, 2), "")
+    al1.p <- draw.aligns( al.1, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al1.p$bottom + al1.p$top)/2, "1,3", cex=2)
+    al2.p <- draw.aligns( al.2, al.x, al1.p$bottom - ch*4, cex=3, draw.char=TRUE, draw.rect=TRUE,
+                         bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al2.p$bottom + al2.p$top)/2, "2,2", cex=2)
+    al3.p <- draw.aligns( al.3, al.x, al2.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    text(al.x - cw*2, (al3.p$bottom + al3.p$top)/2, "1,2", cex=2)
+    ## to extend the alignment add a gap or appropriate character
+    al.1 <- list( c(al.1[[1]], nm$seq[[1]][1]), c(al.1[[2]], "-") )
+    al.2 <- list( c(al.2[[1]], "-"), c(al.2[[2]], nm$seq[[2]][2]) )
+    al.3 <- list( c(al.3[[1]], nm$seq[[1]][1]), c(al.3[[2]], nm$seq[[2]][2]) )
+    al.x <- al1.p$right + 5
+    get.input()
+    al3.p <- draw.aligns( al.1, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al4.p <- draw.aligns( al.2, al.x, al1.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al5.p <- draw.aligns( al.3, al.x, al2.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    return()
+    with(obj$pos, {
+        rect(lx[2], ly[2], lx[3], ly[3], col=pyel)
+        arrows(cx[2], cy[2], c(cx[1], cx[1], cx[2]), c(cy[2], cy[1], cy[1]), lwd=2, length=0.1)
+    })
+    yd <- al1.p$top - al2.p$top
+    text(al.x - cw*2, (al2.p$bottom + al2.p$top)/2 - yd, "1,1", cex=2)
+    ## manually construct as the nm.extract will only give use the best alignment
+    al.3 <- strsplit(c("-A", "A-"), "")
+    al.4 <- strsplit(c("A-", "-A"), "")
+    al.5 <- list("A", "A")
+    al.x <- al1.p$right + 5
+    get.input()
+    al3.p <- draw.aligns( al.3, al.x, 80, cex=3, draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al4.p <- draw.aligns( al.4, al.x, al1.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+    get.input()
+    al5.p <- draw.aligns( al.5, al.x, al2.p$bottom - ch*4, cex=3,
+                         draw.char=TRUE, draw.rect=TRUE, bg.col=nuc.bg, col=nuc.black, family='Mono', font=1 )
+}
+
+slides[[22]] <- function(){
+    obj <- slides[[18]]()
+    nm <- nmw.1
+    extend.alignment(obj, nm, 2, 3)
+}
+
+slides[[23]] <- function(){
+    obj <- slides[[18]]()
+    nm <- nmw.1
+    extend.alignment(obj, nm, 3, 3)
+}
+
+slides[[24]] <- function(){
+    obj <- slides[[18]]()
+    nm <- nmw.1
+    extend.alignment(obj, nm, 7, 7)
+}    
 
 extra.slide <- function(){
     new.slide()

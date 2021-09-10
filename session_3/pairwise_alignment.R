@@ -10,6 +10,7 @@ source("pairwise_alignment/pair_align.R")
 blue <- rgb(0,0,0.75)
 green <- rgb(0, 0.75, 0)
 red <- rgb(0.75, 0, 0)
+pyel <- rgb(0.5, 0.5, 0, 0.5)
 bul.x <- 10
 bul.y <- 80
 bul.cex <- c(3,2,1.5)
