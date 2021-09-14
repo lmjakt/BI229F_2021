@@ -1,30 +1,30 @@
-draw.aligns <- function(al, y1, y2, h1, cols, sp.a=NULL, sp.b=NULL, w.radius=4, w.sd=w.radius/2, sim.h=h1*0.75, sim.sep=h1*0.125,
-                        sim.pos=c(1,1), border=cols){
-    krn <- dnorm( -w.radius:w.radius, sd=w.sd )
-    a.seq <- strsplit( al$seq[1], '' )[[1]]
-    b.seq <- strsplit( al$seq[2], '' )[[1]]
-    sim <- sapply( 1:length(a.seq), function(i){
-        b <- ifelse( i > w.radius, i - w.radius, 1 )
-        e <- ifelse( i + w.radius <= length(a.seq), i + w.radius, length(a.seq) )
-        k.b <- 1 + w.radius - (i-b)
-        k.e <- 1 + w.radius + (e-i)
-        sum( as.numeric(a.seq[b:e] == b.seq[b:e]) * krn[k.b:k.e] ) / sum(krn[k.b:k.e])
-    })
-    ## then draw our rectangles using the colours specified
-    x2 <- 1:length(a.seq)
-    x1 <- x2 - 1
-    rect(x1, y1, x2, y1+h1, col=cols[ a.seq ], border=border[a.seq])
-    rect(x1, y2, x2, y2+h1, col=cols[ b.seq ], border=border[b.seq])
-    ## then we plot the similarity beneath y1, and at 
-    ## sim always has a maximum of 1.
-    sim.y.base <- ifelse( sim.pos[1] == 1, y1, y2 )
-    sim.y <- sim.y.base + ifelse( sim.pos[2] == 1,  -(sim.h + sim.sep), (h1 + sim.sep) )
-    lines( (x1+x2)/2, sim.y + sim * sim.h )
-    segments( 0.5, sim.y, length(a.seq)-0.5, sim.y )
-    segments( (x1+x2)/2, sim.y, (x1+x2)/2, sim.y + ifelse( a.seq == b.seq, sim * sim.h, 0 ) )
-    if(!is.null(sp.a) || !is.null(sp.b))
-        text( 0, y2, paste(sp.a, "vs", sp.b), adj=c(0,1.2) )
-}
+## draw.aligns <- function(al, y1, y2, h1, cols, sp.a=NULL, sp.b=NULL, w.radius=4, w.sd=w.radius/2, sim.h=h1*0.75, sim.sep=h1*0.125,
+##                         sim.pos=c(1,1), border=cols){
+##     krn <- dnorm( -w.radius:w.radius, sd=w.sd )
+##     a.seq <- strsplit( al$seq[1], '' )[[1]]
+##     b.seq <- strsplit( al$seq[2], '' )[[1]]
+##     sim <- sapply( 1:length(a.seq), function(i){
+##         b <- ifelse( i > w.radius, i - w.radius, 1 )
+##         e <- ifelse( i + w.radius <= length(a.seq), i + w.radius, length(a.seq) )
+##         k.b <- 1 + w.radius - (i-b)
+##         k.e <- 1 + w.radius + (e-i)
+##         sum( as.numeric(a.seq[b:e] == b.seq[b:e]) * krn[k.b:k.e] ) / sum(krn[k.b:k.e])
+##     })
+##     ## then draw our rectangles using the colours specified
+##     x2 <- 1:length(a.seq)
+##     x1 <- x2 - 1
+##     rect(x1, y1, x2, y1+h1, col=cols[ a.seq ], border=border[a.seq])
+##     rect(x1, y2, x2, y2+h1, col=cols[ b.seq ], border=border[b.seq])
+##     ## then we plot the similarity beneath y1, and at 
+##     ## sim always has a maximum of 1.
+##     sim.y.base <- ifelse( sim.pos[1] == 1, y1, y2 )
+##     sim.y <- sim.y.base + ifelse( sim.pos[2] == 1,  -(sim.h + sim.sep), (h1 + sim.sep) )
+##     lines( (x1+x2)/2, sim.y + sim * sim.h )
+##     segments( 0.5, sim.y, length(a.seq)-0.5, sim.y )
+##     segments( (x1+x2)/2, sim.y, (x1+x2)/2, sim.y + ifelse( a.seq == b.seq, sim * sim.h, 0 ) )
+##     if(!is.null(sp.a) || !is.null(sp.b))
+##         text( 0, y2, paste(sp.a, "vs", sp.b), adj=c(0,1.2) )
+## }
 
 ## define some sequences that we can use:
 ex.seqs <- c("ACGGATACTAGA", "ACGTACGATAGA")
@@ -449,7 +449,7 @@ slides[[17]] <- function(){
         cat(cell, "\n")
         cell <- trace.ptr( pos, nm$pt, cell[1], cell[2])
     }
-    sc.text("End of new presentation. Move to old one.", x=10, y=1, cex=2, adj=c(0,0))
+##    sc.text("End of new presentation. Move to old one.", x=10, y=1, cex=2, adj=c(0,0))
 }
 
 slides[[18]] <- function(...){

@@ -51,7 +51,7 @@ source("slides.R")
 par(mar=c(5.1, 4.1, 5.1, 4.1))
 par(mfrow=c(1,1))
 par(oma=c(0,0,0,0))
-draw.slides( slides )
+draw.slides( slides[17:length(slides)] )
 
 
 ## just a check
