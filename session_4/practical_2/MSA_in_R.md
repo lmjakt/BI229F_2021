@@ -12,7 +12,7 @@ aims are:
 2. To expose you to R packages useful for handling sequences in R
 3. To allow you to perform multiple sequence alignment and to become aware of
    some of the problems.
-4. To expose you to inheritance and dependance in R.
+4. To expose you to inheritance and dependency in R.
 
 For this we will use the following packages:
 
@@ -173,7 +173,7 @@ Remember that it is not enough for you to enter this code into the main
 script, you also have to run it. In RStudio that probably means something like
 hitting `Ctl-Enter` at the beginning of the code. Put some empty lines between
 each statement so that you can run a single statement at a time. This is
-preferrable when you are new to `R` as it makes it easier for you to
+preferable when you are new to `R` as it makes it easier for you to
 understand the error message you will get when making some mistake or other.
 
 #### What `source` does and how `read.fasta` works
@@ -238,7 +238,7 @@ text. `grep` examines each line of the character vector given as its second
 argument (`data` in this case) and checks whether it contains the pattern
 given as its first argument. The pattern specified here (`"^>"`) matches any
 string that begins with the `">"` character; such lines should contain the
-sequence identifers (consider what is specified by the fasta format). `grep`
+sequence identifiers (consider what is specified by the fasta format). `grep`
 returns the index (the line numbers) of the lines that match the pattern (if
 any). 
 
@@ -433,7 +433,7 @@ cdna <- read.fasta("Human_SOX17_orthologues_cds.fa")
 ```
 
 I have put empty lines between each command here to emphasise that I want you
-to run each command separately. I belive RStudio has a way of doing this
+to run each command separately. I believe RStudio has a way of doing this
 without intervening empty lines; and if it does you can find the answer from
 Google. From here on, you should try to decide yourself whether you want to
 run several statements in one go or to limit yourself to single ones.
@@ -444,7 +444,7 @@ thought it was supposed to do. In this case you can try doing the following:
 
 ```R
 ### run these for all of the objects that you have read in
-### run each command separately as you want to look at the ouput
+### run each command separately as you want to look at the output
 summary(pep)
 length(pep)
 class(pep)
@@ -557,7 +557,7 @@ with the above commands and the sequence data that you have read.
 
 ### Run some MSAs
 
-#### Install the MSA package (and its dependancies)
+#### Install the MSA package (and its dependencies)
 To do multiple sequence alignment we will make use of the `msa` package. This
 package is not a `CRAN` package, but is a `Bioconductor` package. To use it,
 you first have to install it. This requires that you have the appropriate
@@ -574,12 +574,12 @@ BiocManager::install("msa")
 ```
 
 The first part of this code essentially asks whether or not `BiocManager`
-pacakge is installed. If not then it installs it. The next expression uses the
+package is installed. If not then it installs it. The next expression uses the
 `install` function of the `BiocManager` package to install the `msa` package
 from the Bioconductor archive. In general this works; sometimes you may get
 errors related to the R version installed.
 
-The installation of pacakges can be quite time consuming; probably more so on
+The installation of packages can be quite time consuming; probably more so on
 Linux than on Windows as installation on Linux defaults to compiling all `C`
 code included whereas Windows uses precompiled packages[^windows]. 
 
@@ -648,7 +648,7 @@ first `n`, then you can use the `sample` function. See `?sample` to work out how
 In the above code we have not assigned the return value of the call to `msa`
 to any variable. So the calls are kind of useless apart from giving us an idea
 of how much time it will take to align the sequences.
-In the following code replace the defintion of `n` with the number of
+In the following code replace the definition of `n` with the number of
 sequences that you wish to align. 
 
 ```R
@@ -667,7 +667,7 @@ names(cdna.msa.1)
 
 Having obtained the alignment we can see that it is an alignment, but there is
 no obvious way to access the alignment details. Welcome to the wonderful world
-of `S4` objects. Unfotunately the only way to work out what to do is to read
+of `S4` objects. Unfortunately the only way to work out what to do is to read
 the manual. And that is unfortunately rather long. And you will need to read
 more than one manual. I will try to show the process for how to do that here.
 
