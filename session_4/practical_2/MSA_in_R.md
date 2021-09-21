@@ -888,6 +888,20 @@ seems that the Muscle implementation doesn't work for more than 10
 sequences. That should be a bug, and it might be that it works for you since I
 don't have the latest version of R.
 
+### Additional stuff
 
+To get distances we probably want to only consider part of the alignment.
+We can use the colmask attribute of the multiple alignment for this.
+
+```R
+## we can also use th eautomask option.
+cdna.msa.1.masked <- maskGaps(cdna.msa.1, min.fraction=0.5, min.block.width=12)
+colmask(cdna.msa.1.masked)
+                              
+colmask(cdna.msa.1) <- IRanges(start=680, end=850)
+
+dim(as.matrix(cdna.msa.1)) ## not affected by the mask
+
+```
 
 
