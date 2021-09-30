@@ -18,7 +18,7 @@ pgrey <- rgb(0.5, 0.5, 0.5, 0.5)
 pcyan <- rgb(0, 0.5, 0.5, 0.5)
 bul.x <- 10
 bul.y <- 80
-bul.cex <- c(3,2,1.5)
+bul.cex <- c(3,2.5,2)
 
 nuc.col <- c(A=blue, C=green, G=red, T=purple, "-"=black)
 nuc.black <- c(A=black, C=black, G=black, T=black, "-"=black)
@@ -48,7 +48,15 @@ int.dev <- function(){ grepl("X11|windows", names(dev.cur())) }
 slides <- vector(mode='list', length=0)
 source("slides.R")
 
-par(mar=c(5.1, 4.1, 5.1, 4.1))
+par(mar=c(2.1, 2.1, 5.1, 2.1))
 par(mfrow=c(1,1))
 par(oma=c(0,0,0,0))
 draw.slides( slides )
+
+
+cairo_pdf( "l_08_scripts_and_programs.pdf", width=1*19.20, height=1*10.8, onefile=TRUE)
+par(mar=c(5.1, 4.1, 5.1, 4.1))
+par(mfrow=c(1,1))
+par(oma=c(0,0,0,0))
+draw.slides( slides, return.on.last=TRUE )
+dev.off()
