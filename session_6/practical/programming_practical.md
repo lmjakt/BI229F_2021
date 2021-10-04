@@ -1602,6 +1602,18 @@ vector, `matrix` returns a matrix, `c` concatenates vectors and returns a
 vector, and so on). So the above is mainly about what we call the action and
 how you can implement it in your own functions.
 
+#### The ellipsis `...`
+
+If you have looked up `R` manual pages you may have noticed '`...`' as one of
+the arguments. This is called the ellipsis and represents arguments not
+handled by the function but which will be handled by some downstream
+function. Consider the rather pointless function defined below:
+
+```R
+## a function that simply wraps the text function
+draw.text
+```
+
 ### The `apply` family of functions
 
 As mentioned many times, you are not usually expected to make use of loops in
