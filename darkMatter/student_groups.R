@@ -140,6 +140,8 @@ for(i in 1:length(groups)){
 groups.m  <- sapply(groups, eval)
 colnames(groups.m)  <- 1:ncol(groups.m)
 
+
+cairo_pdf("team_members.pdf", width=20, height=14)
 plot.new()
 plot.window(xlim=c(0,100), ylim=c(0,100))
 text(50, 90, "Team members", cex=3)
@@ -152,6 +154,7 @@ memb.y  <- matrix(c(rep( (pos1$t[-1] + pos1$b[-1])/2, 3),
                   ncol=ncol(groups.m), nrow=nrow(groups.m))
 ##
 points(memb.x, memb.y)
-present  <- identify(memb.x, memb.y)
+dev.off()
+##present  <- identify(memb.x, memb.y)
 
 
