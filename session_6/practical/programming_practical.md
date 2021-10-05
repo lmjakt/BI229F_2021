@@ -1606,13 +1606,147 @@ how you can implement it in your own functions.
 
 If you have looked up `R` manual pages you may have noticed '`...`' as one of
 the arguments. This is called the ellipsis and represents arguments not
-handled by the function but which will be handled by some downstream
-function. Consider the rather pointless function defined below:
+handled by the function but which will be passed to another function within the
+function body. Consider the rather pointless `draw.text` function defined below:
 
 ```R
 ## a function that simply wraps the text function
-draw.text
+draw.text <- function(txt, x, y, clear=TRUE, ...){
+    if(clear)
+        plot.new()
+    text(x, y, txt, ...)
+}
+
+## The draw.text function has three named arguments; any other arguments
+## passed to draw.text will simply be passed on to text.
+
+draw.text("Hello World!", 0.5, 0.5)
+## in the next call to draw.text we specify the argument adj;
+## this will be passed to the text function through the
+## ellipsis (...)
+draw.text("Goodbye World!", 1, 0, FALSE, adj=c(1,1))
+    
+## We can also pass other arguments to text
+draw.text("Hello World!", 0, 1, adj=c(0,1), cex=3)
+draw.text("Goodbye World!", 1, 0, FALSE, adj=c(1,0), cex=3)
+
+## We don't have to name the arguments in ..., but it is really
+## advisable to do sp.
+## The following works, because adj is the
+## first argument to text() after x,y, and labels.
+draw.text("Hello World!", 0, 1, TRUE, c(0,1), cex=3)
+
+## but the following will do the wrong thing:
+## since c(0,1), the argument that we want to pass on to
+## text will instead be assigned to the clear argument (which
+## should take a boolean value).
+draw.text("Hello World!", 0, 1, c(0,1), cex=3)
+
+## so _do_ name the arguments that are passed to ...
 ```
+
+When a function takes `...` as part of its arguments the documentation should
+state explicitly the function to which the the ellipsis arguments will be
+passed.
+
+#### Object orientation in `R`
+
+`R` is kind of object orientated[^oop]; for `R` this means that
+there can be several different functions that appear to have the same name. Such
+functions are referred to as *generic* functions and `R` will look at the
+arguments passed in the function call and determine what function will be
+used. This is called *function* dispatch, and is too complicated a topic to
+cover here. If you are feeling particularly ambitious you can find more details
+at <https://www.stat.umn.edu/geyer/3701/notes/generic.html> .
+
+
+[^oop]: There isn't much of an agreement of exactly what is needed in order to
+    consider a computing language object. This doesn't really matter, but what
+    does matter is how `R` determines what function to run.
+
+As an example, consider the function `plot`. Remember that when you simply
+type the name of a function you will usually see the source code for the
+function. If you do this for `plot` you will get the following:
+
+```R
+function (x, y, ...) 
+UseMethod("plot")
+<bytecode: 0x5600db691618>
+<environment: namespace:graphics>
+```
+
+The `UseMethod("plot")` bit tells us that `R` will do something magical to
+choose a plotting function that depends on the class of the arguments passed
+to the plot function. You can use the `methods` function to find what the
+currently available[^avail] options are:
+
+```R
+methods(plot)
+ [1] plot.acf*           plot.data.frame*    plot.decomposed.ts*
+ [4] plot.default        plot.dendrogram*    plot.density*      
+ [7] plot.ecdf           plot.factor*        plot.formula*      
+[10] plot.function       plot.hclust*        plot.histogram*    
+[13] plot.HoltWinters*   plot.isoreg*        plot.lm*           
+[16] plot.medpolish*     plot.mlm*           plot.ppr*          
+[19] plot.prcomp*        plot.princomp*      plot.profile.nls*  
+[22] plot.raster*        plot.spec*          plot.stepfun       
+[25] plot.stl*           plot.table*         plot.ts            
+[28] plot.tskernel*      plot.TukeyHSD*     
+see '?methods' for accessing help and source code
+ ```
+
+For `S3` class objects `R` will look for a method that has a `.classname`
+appended to it. Eg, if you do:
+
+```R
+h1 <- hist( rnorm( 200 ) )
+class(h1)  ## histogram
+
+## this should be equivalent to
+plot(h1)
+
+plot.histogram(h1)
+## except for the fact that the "*" at the end of the name in the
+## output of methods(plot) means that the function is not exported
+## explicitly
+```
+
+If no suitable method is found then `R` will use the `.default` method.
+
+Although the source of the function may not be exported (as for the class
+`histogram`) you should still be able to get the documentation for the
+specific functions:
+
+```R
+?plot.histogram
+
+plot.histogram            package:graphics             R Documentation
+
+Plot Histograms
+
+Description:
+
+     These are methods for objects of class ‘"histogram"’, typically
+     produced by ‘hist’.
+
+Usage:
+
+     ## S3 method for class 'histogram'
+     plot(x, freq = equidist, density = NULL, angle = 45,
+                    col = NULL, border = par("fg"), lty = NULL,
+                    main = paste("Histogram of",
+                                 paste(x$xname, collapse = "\n")),
+                    sub = NULL, xlab = x$xname, ylab,
+                    xlim = range(x$breaks), ylim = NULL,
+                    axes = TRUE, labels = FALSE, add = FALSE,
+                    ann = TRUE, ...)
+     
+     ## S3 method for class 'histogram'
+     lines(x, ...)
+...
+```
+
+[^avail]: The set of options changes when you load packages and is not constant.
 
 ### The `apply` family of functions
 
@@ -1803,6 +1937,483 @@ mapply(sum, v1, v2)
 Again, you should by now be able to work out what is going on here.
 
 Of course, you can also give a function defintion as an argument to mapply.
+
+## Drawing stuff in `R`
+
+`R` contains many functions for standard plot types. These include (among others):
+
+1. `plot.default`: x-y scatter plot
+2. `barplot`: plot quantities as bars
+3. `boxplot`: box-and-whisker plot(s) of the ranges of grouped values
+4. `strpchar`: one dimensional scatter charts
+5. `hist` : calculates and plots distributions as barplots
+6. `dotchart`: plot quantites as points
+
+These allow you to visualise numbers in fairly basic, not-so-pretty
+ways. There are also many packages that provide much more complex and
+appealing data visualisation (eg. see `ggplot2`). For a range of examples,
+have a look at: <https://www.r-graph-gallery.com/all-graphs.html>.
+
+Remember that `plot` is a generic function, and that calling the outcome of
+`plot(X)` depends on the class of `X`. It can be almost anything, and this is
+one of the reasons I will cover only the lower level drawing functions here.
+
+There are countless examples on the internet detailing how to use these
+different plot types and packages and I will not cover them here. Instead I
+want to cover the low level graphics functions that are built in to `R` and
+which allow you to build your own data visualisation. Using these is more akin
+to *drawing with numbers* than to simply plotting values in more and more
+pretty ways.
+
+
+To draw in `R` you need to understand a rather small set of functions that
+are used to either set up the plotting surface and it's coordinates, draw
+things on that surface and to modify the way in which things are drawn:
+
+1. Initialisation
+   1. `plot.new` clear any previous plots
+   2. `plot.window`  set up the coordinate system
+2. Drawing functions
+   1. `points` draw points
+   1. `lines` draw lines
+   2. `segments` draw lines specified in a different way
+   3. `rect` draw rectangles
+   4. `polygon` draw polygons
+   5. `abline` draw lines specified by equations
+   6. `text`, `mtext` draw text objects
+   7. `legend` add a legend to a function
+3. Modifying functions
+   1. `par` changes graphics parameters in a large number of ways
+   2. `rgb` specify colours using red-green-blue
+   3. `hsv` specify colours using hue-saturation-value
+   4. `layout` draw several plots on one page
+  
+When combined with fairly simple mathematical constructs you can, reasonably
+efficiently draw more or less anything you like with this set of
+functions. Note that many of the plot commands will pass arguments to `par`;
+this means that you often have to look at the help page for the `par` function
+in order to work out how to use the various drawing functions.
+
+### Initialising a plotting area
+
+To start a new plot or drawing simply call `plot.new()`. This will clear the
+current graphics device (which may be a window on your screen, or a device
+that draws the commands to a file). If you are using `RStudio` I would
+probably recommend calling the `x11()` function first before calling
+`plot.new()`. This will create a graphics device associated with a free
+floating window that you can resize to your heart's content. The little
+plotting tab that you get in `RStudio` is frequently too small for more
+complicated graphs.
+
+After calling `plot.new()` you can can call `plot.window()` to set up the
+coordinate system. All that does is to define what the minimum and maximal
+coordinates within your plotting system will be. Try the following:
+
+```R
+x11()
+## but call x11 only once unless you know what you are doing, or if
+## you inadvertently close the plotting window.
+
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+## let use draw some points at the indicated x and y positions:
+points(x=c(0, 0, 100, 100), y=c(0, 100, 0, 100))
+
+## the graphical parameter 'usr' defines the limits of the current plot
+## window. Try:
+par('usr')
+
+## try the following:
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100), xaxs='i', yaxs='i')
+points(x=c(0, 0, 100, 100), y=c(0, 100, 0, 100))
+par('usr')
+## do you see the difference?
+
+## plot.window has an additional option asp:
+## try
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100), asp=1)
+points(x=c(0, 0, 100, 100), y=c(0, 100, 0, 100))
+
+## then resize the window and see if you can work out what
+## is different.
+```
+
+### Drawing points
+
+To draw any number of points on a plot, simply specify their x and y
+coordinates in two vectors:
+
+```R
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+x <- sort(sample(1:100, 30))
+y <- sort(sample(1:100, 30))
+## if you don't understand the two lines above, then
+## have a look at x and y. If you still don't understand
+## then look at the help page for sample and sort and play
+## around with them until things make sense
+
+points(x, y)
+
+## for points we can change the size of the points using the cex parameter:
+points(x, y, cex=3) ## note how things are just added to the plot.
+
+## we can specify different point sizes for every point:
+points(x, y, cex=1:10/2)  ## the values are recycled..
+
+## there are also different plotting characters (pch)
+points(x, y, cex=1:10/2, pch=1:30)  ## the values are recycled..
+
+## oops note the warnings.. seems only 25 different plotting characters
+points(x, y, cex=1:10/2, pch=1:25)  ## the values are recycled..
+
+## we can also specify the colours. There are many packages and functions
+## that generate colour gradients; but we can also use the base hsv and rgb
+## functions. Here the hsv one seems good..
+
+points(x, y, cex=1:10/2, pch=1:25, col=hsv( 1:30/30, 0.8, 0.8 ))  ## the values are recycled..
+## see if you can work out what is going on there:
+## with hsv we specify hue (colour), saturation and the value (brightness) of each colour
+## Each value should be between 0 and 1. hsv( x, 0, 1 ) is white for any value
+## of x, whereas hsv(x, y, 0) is black for all values of x and y.
+
+## plot characters are composed of lines. We can set the line width of these using
+## lwd:
+points(x, y, cex=1:10/2, pch=1:25, col=hsv( 1:30/30, 0.8, 0.8 ), lwd=3)
+
+## all of the above is quite similar to simply doing:
+
+plot(x, y, cex=1:10/2, pch=1:25, col=hsv( 1:30/30, 0.8, 0.8 ), lwd=3)
+## except you then get a box and some axes and other things.
+
+## note you could also do:
+plot(x, y, cex=1:10/2, pch=1:25, col=hsv( 1:30/30, 0.8, 0.8 ), lwd=3, type='l')
+points(x, y, cex=1:10/2, pch=1:25, col=hsv( 1:30/30, 0.8, 0.8 ), lwd=3)
+## to gradually build up a plot in any wayyou like.
+```
+
+### Drawing lines with `lines` and `segments`
+
+`lines` draws a line through a number of points specified by two vectors
+specifiying the x and y coordinates. `segments` draws individual lines
+specified by pairs of coordinates; it is useful when you want to disconnected
+lines specified by some set of numbers. Using the x and y coordinates we
+created in the previous section (they will still be available as long as you
+have not deleted them).
+
+```R
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+## draw a line through x and y:
+lines(x, y)
+
+## lets make it a nicer colour and thickness
+lines(x, y, col=hsv( 1:30/30, 0.8, 0.8 ), lwd=3)
+## hmm that only gives us a single colour..
+
+## lets put some points on the line
+points(x, y, col=hsv( 1:30/30, 0.8, 0.8 ), lwd=3)
+
+## image if we had some standard errors or deviations
+## we can draw these with segments..
+p.se <- rnorm( length(x), sd=3 )
+
+## speficy the x0, y0, x1, y1
+## with lines drawn from (x0[i],y0[i]) to (x1[i],y1[i])
+segments( x0=x, y0=y-p.se, x1=x, y1=y+p.se, lwd=3,
+         col=hsv( 1:30/30, 0.8, 0.8 ) )
+## hey we get individual colours again..
+
+## actually if you really want to draw error bars you can use
+## arrows.. it behaves very similarly
+
+arrows( x0=x, y0=y-p.se, x1=x, y1=y+p.se, lwd=3,
+         col=hsv( 1:30/30, 0.8, 0.8 ), angle=90, length=0.05, code=3 )
+```
+
+### Drawing rectangles with `rect`
+
+`rect` draws rectangles specified in manner very similar to how lines are
+specified in `segments`; the arguments are `left`, `bottom`, `right` and
+`top`. We can use `rect` to make a sort of fancy barplot with the same data.
+
+```R
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+## lets add a thick line to start with..
+lines(x, y, lwd=3)
+points(x, y, pch=3, lwd=3, cex=2 )
+
+## we need to specify left and right coordinates. This is most easily done
+## by using x[1:(n-1)] as the left coordinates and x[2:n] as the right coordinates
+## we can make the tops of the rectangles the mean of neighbouring points
+## (note that 1:(n-1) is the same as 2:n - 1
+n <- length(x)
+top <- (y[2:n-1] + y[2:n]) / 2
+
+rect( x[1:(n-1)], 0, x[2:n], top )
+## we can specify a transparent colour (the last 0.5 in the hsv command)
+rect( x[1:(n-1)], 0, x[2:n], top, col=hsv( 1:30/30, 0.8, 0.8, 0.5 ) )
+
+## note what happens when you repeat the rect call:
+rect( x[1:(n-1)], 0, x[2:n], top, col=hsv( 1:30/30, 0.8, 0.8, 0.5 ) )
+## the colours get more distinct.
+```
+
+### Drawing with `polygon`
+
+We can do the same plot using the polygon function. This lets us draw a filled
+polygon represening the area under the curve.
+
+```R
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+## lets add a thick line to start with..
+lines(x, y, lwd=3)
+
+## for this we want to define new start and end points with 0 at the end.
+n <- length(x)
+polygon( c(x[1], x, x[n]), c(0, y, 0), col=hsv( 0.3, 0.8, 0.8, 0.5 ) )
+
+## we can do something more fancy using hist and some more numbers.
+h1 <- hist( rnorm( 10000, mean=0.5, sd=1 ) )
+h2 <- hist( rnorm( 10000, mean=-0.5, sd=2 ))
+
+## h1 and h2 are named lists. Check ?hist for more details. I will use some
+## of the members of h1 and h2 here
+
+plot.new()
+plot.window( xlim=range( c(h1$mids, h2$mids)), ylim=c(0, max(c(h1$counts, h2$counts))))
+n1 <- length( h1$mids )
+n2 <- length( h2$mids )
+
+polygon( c(h2$mids[1], h2$mids, h2$mids[n2]), c(0, h2$counts, 0), col=hsv(0.2, 0.8, 0.8, 0.5) )
+polygon( c(h1$mids[1], h1$mids, h1$mids[n1]), c(0, h1$counts, 0), col=hsv(0.5, 0.8, 0.8, 0.5) )
+
+## we can add some axes using axis:
+axis(1)
+axis(2)
+axis(3)
+axis(4)
+
+## we can use legend to add a legend..
+legend('topright', legend=c("data 1", "data 2"), fill=hsv( c(0.5, 0.2), 0.8, 0.8, 0.5 ))
+```
+
+### `abline` to draw equations
+
+Use `abline` for drawing lines by equations:
+
+```R
+## 
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+## lets add some points..
+points(x, y, lwd=3)
+
+## use lm (linear model) to make a linear regression
+lm1 <- lm(y ~ x)
+abline(lm1)
+## but the more general form is to specify
+## a and b in
+## y = a + bx
+a <- lm1$coefficients[1]
+b <- lm1$coefficients[2]
+abline(a, b, col='red', lwd=2)
+
+## you can also specify vertical and horizontal lines:
+## and as for any line we can also specify the line type
+## with lty
+abline(h=seq(0, 100, 10), lty=2)
+abline(v=seq(0, 100, 10), lty=2)
+
+## there is also the grid command if that is what you
+## want:
+grid( col='blue', lwd=3)
+```
+
+#### Drawing text with `text` and `mtext`
+
+As usual with R the most difficult thing to do well is to handle textual
+data. The basic text command is `text`, and that takes a set of x and y
+coordinates as well as a set of labels to draw and information about how to
+draw the text.
+
+```R
+## again we will use our previously generated x and y coordinates:
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+
+## instead of drawing points, lets use letters..
+n <- length(x)
+text(x, y, letters[1:n] )
+points(x, y) ## hmm. we don't have enough letters
+
+## lets make some other labels;
+lab <- paste("sample", 1:n, sep="_")
+
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab)
+
+## that has a lot overlap. We can try to rotate the text with
+## the parameter 'srt'
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90)
+
+## see what happens when you resize the window..
+## the text size stays the same; R always tries to
+## set the physical size of the text, whether that
+## be on the screen or in a pdf.
+
+## to change the size, use cex as usual:
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90, cex=2)
+
+## you can specify colour and others as usual.
+## Use font to specify italic or bold, or both:
+## bold
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90, cex=2, font=2)
+
+## italic
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90, cex=2, font=3)
+
+## bold italic
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90, cex=2, font=4)
+
+## if the font is available on your system you may be able to
+## also specify a specific font using the family option:
+
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90, cex=2, font=1, family="Times")
+
+plot.new()
+plot.window(xlim=c(0,100), ylim=c(0,100))
+text(x, y, lab, srt=90, cex=2, font=1, family="Arial")
+```
+
+### Several plots on one page
+
+There are several ways in which you can combine several plots on one page. The
+simplest of these is to use `par(mfrow=c(nrow, ncol))` to split the page into
+equally sized rows and columns. The `layout` function can do more complex
+layouts where you can specify widths and heights of the rows as well as
+merging the columns.
+
+```R
+## use par('mfrow'=c(..)) to set up a plotting surface:
+## note that this will be set for your currently active graphics
+## device.
+
+par(mfrow=c(2,2))
+hist(x, main="histogram of x", xlab="X-values" )
+hist(y, main="histogram of y", xlab="Y-values" )
+plot( x, y, type='l', lwd=3 )
+plot( x, y, type='b', lwd=4, col=hsv(1:30/30, 0.5, 0.5, 0.8), pch=19, cex=3 )
+```
+
+To use `layout` you must specify a matrix as the first argument; that matrix
+should contain values which specify the order in which the plots will be
+plotted. Values of 0 will cause an empty section. 
+
+```R
+## our layout matrix:
+m1 <- matrix(1:4, nrow=2, byrow=FALSE)
+## look at m1!
+
+layout(m1, widths=c(10, 5), heights=c(5, 10))
+
+hist(x, main="histogram of x", xlab="X-values" )
+hist(y, main="histogram of y", xlab="Y-values" )
+plot( x, y, type='l', lwd=3 )
+plot( x, y, type='b', lwd=4, col=hsv(1:30/30, 0.5, 0.5, 0.8), pch=19, cex=3 )
+
+## you can also merge two or more panels:
+m2 <- rbind(c(1,1,1), 2:4)
+## look at m2!
+
+## not terribly pretty, but hopefully you understand what is going on here:
+layout(m2)
+hist(x, main="histogram of x", xlab="X-values" )
+hist(y, main="histogram of y", xlab="Y-values" )
+plot( x, y, type='l', lwd=3 )
+plot( x, y, type='b', lwd=4, col=hsv(1:30/30, 0.5, 0.5, 0.8), pch=19, cex=3 )
+```
+
+### A bit of trigonometry to specify positions
+
+In all of the above we have only drawn straight lines and edges. We can use a
+bit of simple trigonometry to draw circles, arcs and spirals.
+
+```R
+## to draw a circle we need to specify the x and y coordinates of a
+## circle. That is sin(a) and cos(a) where a ia an angle
+## (I never remember which should be cos and sin, but it doesn't really
+## matter here).
+
+## angles in radians..
+## a full circle
+a1 <- seq(0, 2*pi, length.out=1000)
+
+par(mfrow=c(1,1))
+plot.new()
+plot.window(xlim=c(0, 100), ylim=c(0,100), asp=1)
+
+## specify some different radius values
+r <- seq(10, 50, 10)
+ori <- c(50,50)
+
+## draws a circle
+lines( ori[1] + r[1] * cos(a1), ori[2] + r[1] * sin(a1) )
+
+## draws a bigger circle
+lines( ori[1] + r[2] * cos(a1), ori[2] + r[2] * sin(a1) )
+
+polygon( ori[1] + r[2] * cos(a1), ori[2] + r[2] * sin(a1), col=hsv(0.3, 0.7, 0.8, 0.3) )
+polygon( ori[1] + r[1] * cos(a1), ori[2] + r[1] * sin(a1), col=hsv(0.3, 0.7, 1, 0.3) )
+
+## in a different location:
+polygon( 20 + r[1] * cos(a1), 80 + r[1] * sin(a1), col=hsv(0.3, 0.7, 1, 0.3) )
+## draw a slice
+a2 <- seq(0, 0.73*pi, length.out=1000)
+polygon( 20 + r[1] * cos(a2), 80 + r[1] * sin(a2), col=hsv(0.3, 0.7, 1, 0.3) )
+
+## to make an arc, simply connect to the origin..
+polygon( c(20, 20 + r[1] * cos(a2), 20), c(80, 80 + r[1] * sin(a2), 80), col=hsv(0.8, 0.7, 1, 1) )
+
+## to make a spiral simply specify more angles and an increasing radius
+a3 <- seq(0, 10*pi, length.out=1000)
+r2 <- seq(1, 50, length.out=1000)
+
+lines( 50 + r2 * cos(a3), 50 + r2 * sin(a3), lwd=3 )
+```
+
+### Drawing summary
+
+For most situations you should probably consider to make use of built in
+plotting functions. However, if you know how to use `R`'s drawing primitives
+it is possible for you to consider what *you want to do* rather than what
+*functions are available*. And there are lots of situations where this can be
+very useful. Although it can take some time to create your own plotting
+functions you should not discount the time it takes to read and understand
+package documentation.
 
 ## Additional stuff
 
