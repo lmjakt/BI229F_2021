@@ -175,6 +175,13 @@ tmp1 <- translate( subseq(mapped, 1), no.init.codon=TRUE )
 tmp2 <- translate( subseq(mapped, 2), no.init.codon=TRUE )
 tmp3 <- translate( subseq(mapped, 3), no.init.codon=TRUE )
 
+tmp.r1 <- translate( subseq(reverseComplement( mapped ), 1), no.init.codon=TRUE )
+tmp.r2 <- translate( subseq(reverseComplement( mapped ), 2), no.init.codon=TRUE )
+tmp.r3 <- translate( subseq(reverseComplement( mapped ), 3), no.init.codon=TRUE )
+
+tmp.tmp  <- reverseComplement( mapped )
+
+
 ## these have * in them. How can we handle them?
 tmp1.1 <- strsplit( tmp1, "*", fixed=TRUE )
 
@@ -189,3 +196,22 @@ head( nchar( strsplit(tmp1, "*", fixed=TRUE) ))
 ## by splitting on "*" (indicating a stop codon), and then calling
 ## nchar on the resulting objects
 plot( sapply( nchar(strsplit(tmp1, "*", fixed=TRUE)), max ) )
+
+count.kmers  <- function(k, seq){
+    kmer  <- vector(mode='list', length=length(k))
+    for(i in k){
+        print(i)
+        kmer[[i]]  <- colSums(oligonucleotideFrequency( seq, width = i ))
+        gc()
+    }
+    kmer
+}
+
+k  <- 1:7
+kmer.un.f  <- count.kmers( k, unmap )
+kmer.ma.f  <- count.kmers( k, mapped )
+
+plot( kmer.un.f[[3]], kmer.ma.f[[3]], type='n', xlab='sosms', ylab='count')
+text( kmer.un.f[[3]], kmer.ma.f[[3]], names(kmer.un.f[[3]]) )
+
+
