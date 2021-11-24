@@ -140,7 +140,7 @@ for(i in 1:length(groups)){
 groups.m  <- sapply(groups, eval)
 colnames(groups.m)  <- 1:ncol(groups.m)
 
-write.table(t(groups.m), "groups.txt")
+write.table(t(groups.m), "groups.txt", quote=FALSE, sep="\t")
 
 cairo_pdf("team_members.pdf", width=20, height=14)
 plot.new()
